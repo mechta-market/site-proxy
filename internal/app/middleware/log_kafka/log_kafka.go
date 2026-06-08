@@ -45,6 +45,13 @@ func (m *Middleware) Middleware(next http.Handler) http.Handler {
 		rw := newResponseWriter(w)
 		next.ServeHTTP(rw, r)
 
+		headers := make(map[string]string, len(r.Header))
+		for k, v := range r.Header {
+			if len(v) > 0 {
+				headers[k] = v[0]
+			}
+		}
+
 		go m.sendToKafka(&kafkaMessagePayload{
 			Ts:        time.Now().UTC(),
 			Method:    r.Method,
@@ -53,7 +60,7 @@ func (m *Middleware) Middleware(next http.Handler) http.Handler {
 			ReqBody:   normalizeJSON(reqBody, false),
 			RepStatus: rw.statusCode,
 			RepBody:   normalizeJSON(rw.body.Bytes(), rw.Header().Get("Content-Encoding") == "gzip"),
-			Cookie:    r.Header.Get("Cookie"),
+			Headers:   headers,
 		})
 	})
 }
