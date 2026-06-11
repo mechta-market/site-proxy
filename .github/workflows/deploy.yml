@@ -8,8 +8,8 @@ jobs:
     name: Build and deploy
     runs-on: ubuntu-latest
     env:
-      OWNER: rendau
-      IMAGE: hps:1.0
+      OWNER: mechta-market
+      IMAGE: site-proxy:latest
     steps:
       - uses: actions/checkout@v6
 
