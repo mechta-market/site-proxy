@@ -57,7 +57,7 @@ func New(src []string) *Filter {
 
 func (r *Filter) Check(method, pathStr string) bool {
 	if len(r.rules) == 0 {
-		return false
+		return true
 	}
 
 	pathStr = strings.ToLower("/" + strings.Trim(pathStr, "/"))
