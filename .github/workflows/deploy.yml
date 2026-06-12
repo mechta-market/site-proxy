@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build and deploy
-    runs-on: ubuntu-latest
+    runs-on: yc-arc
     env:
       OWNER: mechta-market
       IMAGE: site-proxy:latest
