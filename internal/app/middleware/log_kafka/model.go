@@ -37,13 +37,12 @@ func (rw *responseWriter) Write(b []byte) (int, error) {
 // KafkaMessage payload
 
 type kafkaMessagePayload struct {
-	Ts        time.Time         `json:"ts"`
-	Method    string            `json:"method"`
-	Path      string            `json:"path"`
-	Query     string            `json:"query"`
-	ReqBody   json.RawMessage   `json:"req_body"`
-	RepStatus int               `json:"rep_status"`
-	RepBody   json.RawMessage   `json:"rep_body"`
-	Headers   map[string]string `json:"headers"`
-	Cookies   map[string]string `json:"cookies"`
+	Ts        time.Time      `json:"ts"`
+	Method    string         `json:"method"`
+	Path      string         `json:"path"`
+	Query     string         `json:"query"`
+	ReqBody   json.RawMessage `json:"req_body"`
+	RepStatus int            `json:"rep_status"`
+	RepBody   json.RawMessage `json:"rep_body"`
+	Headers   map[string]any `json:"headers"`
 }
