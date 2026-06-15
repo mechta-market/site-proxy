@@ -61,6 +61,7 @@ func (m *Middleware) Middleware(next http.Handler) http.Handler {
 			RepStatus: rw.statusCode,
 			RepBody:   normalizeJSON(rw.body.Bytes(), rw.Header().Get("Content-Encoding") == "gzip"),
 			Headers:   headers,
+			Cookies:   parseCookies(r.Cookies()),
 		})
 	})
 }
@@ -82,6 +83,14 @@ func (m *Middleware) sendToKafka(msg *kafkaMessagePayload) {
 	if err != nil {
 		slog.Error("failed to write message to kafka", "error", err, "msg", msg)
 	}
+}
+
+func parseCookies(cookies []*http.Cookie) map[string]string {
+	result := make(map[string]string, len(cookies))
+	for _, c := range cookies {
+		result[c.Name] = c.Value
+	}
+	return result
 }
 
 func normalizeJSON(data []byte, isGzip bool) json.RawMessage {
