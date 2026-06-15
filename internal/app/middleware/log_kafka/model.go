@@ -45,4 +45,5 @@ type kafkaMessagePayload struct {
 	RepStatus int               `json:"rep_status"`
 	RepBody   json.RawMessage   `json:"rep_body"`
 	Headers   map[string]string `json:"headers"`
+	Cookies   map[string]string `json:"cookies"`
 }
