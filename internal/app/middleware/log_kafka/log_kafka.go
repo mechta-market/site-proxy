@@ -47,7 +47,7 @@ func (m *Middleware) Middleware(next http.Handler) http.Handler {
 
 		headers := make(map[string]any, len(r.Header)+1)
 		for k, v := range r.Header {
-			if len(v) > 0 {
+			if len(v) > 0 && k != "Cookie" {
 				headers[k] = v[0]
 			}
 		}
