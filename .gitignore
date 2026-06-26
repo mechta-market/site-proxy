@@ -8,3 +8,4 @@ build/
 conf.yml
 /svc
 .env
+.env.development
