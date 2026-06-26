@@ -45,13 +45,21 @@ func (m *Middleware) Middleware(next http.Handler) http.Handler {
 		rw := newResponseWriter(w)
 		next.ServeHTTP(rw, r)
 
-		headers := make(map[string]any, len(r.Header)+1)
-		for k, v := range r.Header {
-			if len(v) > 0 && k != "Cookie" {
-				headers[k] = v[0]
-			}
+		if rw.statusCode != http.StatusOK && rw.statusCode != http.StatusCreated {
+			return
 		}
-		headers["cookies"] = parseCookies(r.Cookies())
+
+		headers := map[string]any{
+			"User-Agent":         r.Header.Get("User-Agent"),
+			"Referer":            r.Header.Get("Referer"),
+			"Accept-Language":    r.Header.Get("Accept-Language"),
+			"X-Mechta-App":       r.Header.Get("X-Mechta-App"),
+			"X-Mechta-Device-Id": r.Header.Get("X-Mechta-Device-Id"),
+			"X-City-Code":        r.Header.Get("X-City-Code"),
+			"Cf-Ipcountry":       r.Header.Get("Cf-Ipcountry"),
+			"Cf-Connecting-Ip":   r.Header.Get("Cf-Connecting-Ip"),
+			"cookies":            parseCookies(r.Cookies()),
+		}
 
 		go m.sendToKafka(&kafkaMessagePayload{
 			Ts:        time.Now().UTC(),
@@ -85,10 +93,25 @@ func (m *Middleware) sendToKafka(msg *kafkaMessagePayload) {
 	}
 }
 
+var allowedCookies = map[string]struct{}{
+	"mechtakz_session":       {},
+	"user_device_id":         {},
+	"platform_type":          {},
+	"selectedCity":           {},
+	"roistat_visit":          {},
+	"roistat_call_tracking":  {},
+	"roistat_cookies_to_resave": {},
+	"_userGUID":              {},
+	"AMP_MKTG_383e593a34":   {},
+	"_ga":                    {},
+}
+
 func parseCookies(cookies []*http.Cookie) map[string]string {
-	result := make(map[string]string, len(cookies))
+	result := make(map[string]string)
 	for _, c := range cookies {
-		result[c.Name] = c.Value
+		if _, ok := allowedCookies[c.Name]; ok {
+			result[c.Name] = c.Value
+		}
 	}
 	return result
 }
