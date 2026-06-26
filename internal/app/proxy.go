@@ -32,6 +32,17 @@ func proxyGetHandler() http.Handler {
 				r.Out.Host = conf.TargetHost
 			}
 		},
+		ModifyResponse: func(resp *http.Response) error {
+			if conf.HttpCors {
+				origin := resp.Request.Header.Get("Origin")
+				if origin == "" {
+					origin = "*"
+				}
+				resp.Header.Set("Access-Control-Allow-Origin", origin)
+				resp.Header.Set("Access-Control-Allow-Credentials", "true")
+			}
+			return nil
+		},
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
 			if r.Context().Err() != nil {
 				return
